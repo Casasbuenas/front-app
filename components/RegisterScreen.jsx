@@ -81,7 +81,7 @@ export default function RegisterScreen() {
       return alert('Las contraseñas no coinciden.');
     }
     try {
-      const resp = await fetch('https://front-app-dajj.onrender.com/register', {
+      const resp = await fetch('https://backend-app-huge.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

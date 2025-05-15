@@ -22,7 +22,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      const resp = await fetch('https://front-app-dajj.onrender.com/iniciosesion', {
+      const resp = await fetch('https://backend-app-huge.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
