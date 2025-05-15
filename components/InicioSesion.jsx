@@ -20,9 +20,10 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const API_URL = 'https://backend-app-huge.onrender.com';
   const handleLogin = async () => {
     try {
-      const resp = await fetch('https://backend-app-huge.onrender.com', {
+      const resp = await fetch('https://backend-app-huge.onrender.com/iniciosesion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

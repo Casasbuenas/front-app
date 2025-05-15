@@ -75,13 +75,14 @@ export default function RegisterScreen() {
     value: `${i + 1}`,
   }));
 
-  
+  const API_URL = 'https://backend-app-huge.onrender.com';
+
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       return alert('Las contraseñas no coinciden.');
     }
     try {
-      const resp = await fetch('https://backend-app-huge.onrender.com', {
+      const resp = await fetch('https://backend-app-huge.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
