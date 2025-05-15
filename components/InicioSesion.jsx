@@ -1,186 +1,142 @@
-
+// LoginScreen.jsx
 import React, { useState } from 'react';
-import { Link } from 'expo-router';
 import {
   View,
   Text,
+  Image,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
-  Image,
-  Platform,
+  Dimensions,
 } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
-export default function InicioSesion() {
-  const [showPwd, setShowPwd] = useState(false);
+const { width } = Dimensions.get('window');
+const BUTTON_WIDTH = Math.min(width * 0.9, 320);
+
+export default function LoginScreen() {
+  const nav = useNavigation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const handleLogin = async () => {
+    try {
+      const resp = await fetch('http://192.168.1.55:5000/iniciosesion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          NombreDeUsuario: username,
+          Contraseña: password,
+        }),
+      });
+      const json = await resp.json();
+      if (json.status) {
+        await AsyncStorage.setItem('user', JSON.stringify(json.data));
+        nav.replace('home', { user: json.data });
+      } else {
+        alert(json.message);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error al conectar al servidor.');
+    }
+  };
+
   return (
-    <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        {/* Título */}
-        <Text style={styles.title}>Iniciar sesión</Text>
+    <View style={styles.container}>
+      <Image
+        source={require('../assets/images/LogoIdea2sinletras (1).png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>LinkUp</Text>
+      <Text style={styles.description}>
+        Bienvenidos a nuestra app. Aquí podrás crear proyectos de estudio y entrar a proyectos por medio de match.
+      </Text>
 
-        {/* Logo */}
-        <Image
-          source={require('../assets/images/LogoIdea2sinletras (1).png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      {/* Usuario */}
+      <TextInput
+        placeholder="Nombre de usuario"
+        placeholderTextColor="#888"
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+      />
 
-        {/* Usuario / Email */}
-        <View style={styles.inputWrapper}>
-          <Text style={styles.label}>Usuario/Email</Text>
-          <TextInput
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Usuario/Email"
-            placeholderTextColor="#888"
-            style={styles.input}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-        </View>
+      {/* Contraseña */}
+      <TextInput
+        placeholder="Contraseña"
+        placeholderTextColor="#888"
+        secureTextEntry
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+      />
 
-        {/* Contraseña */}
-        <View style={[styles.inputWrapper, { marginTop: 16 }]}>
-          <Text style={styles.label}>Contraseña</Text>
-          <View style={styles.input}>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Contraseña"
-              placeholderTextColor="#888"
-              secureTextEntry={!showPwd}
-              style={styles.textInputInside}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPwd((v) => !v)}
-              style={styles.eyeIcon}
-            >
-              <Feather
-                name={showPwd ? 'eye' : 'eye-off'}
-                size={20}
-                color="#888"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+      {/* Botón Iniciar Sesión */}
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+      </TouchableOpacity>
 
-        {/* Olvidaste contraseña */}
-        <TouchableOpacity style={styles.forgotWrapper}>
-          <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-
-        {/* Botones de inicio */}
-        <Link href="/home" asChild>
-        <TouchableOpacity style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
-        </Link>
-
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialButtonText}>Iniciar sesión con Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialButtonText}>Iniciar sesión con Facebook</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialButtonText}>Iniciar sesión con Apple</Text>
-        </TouchableOpacity>
-
-        {/* Problemas */}
-        <TouchableOpacity style={styles.forgotWrapper}>
-          <Text style={styles.forgotText}>¿Problemas al iniciar sesión?</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      {/* Link a Registro */}
+      <TouchableOpacity onPress={() => nav.navigate('register')}>
+        <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
     backgroundColor: '#170F24',
-  },
-  container: {
-    padding: 20,
     alignItems: 'center',
-  },
-  title: {
-    marginTop: Platform.OS === 'ios' ? 60 : 40,
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFF',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   logo: {
-    width: 120,
-    height: 120,
-    marginVertical: 20,
+    width: 192,
+    height: 192,
+    marginBottom: 24,
   },
-  inputWrapper: {
-    width: '100%',
+  title: {
+    fontSize: 30,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 16,
   },
-  label: {
-    color: '#FFF',
-    fontSize: 14,
-    marginBottom: 6,
+  description: {
+    maxWidth: 384,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#FFFFFF',
+    lineHeight: 24,
+    marginBottom: 32,
   },
   input: {
-    position: 'relative',
+    width: BUTTON_WIDTH,
     backgroundColor: '#1E1C2C',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     color: '#FFF',
+    marginVertical: 6,
   },
-  textInputInside: {
-    color: '#FFF',
-    flex: 1,
-    paddingRight: 36,
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 16,
-    top: '50%',
-    marginTop: -10,
-  },
-  forgotWrapper: {
-    alignSelf: 'flex-end',
-    marginTop: 8,
-  },
-  forgotText: {
-    color: '#888',
-    fontSize: 13,
-  },
-  primaryButton: {
-    width: '100%',
-    backgroundColor: '#7B61FF',
-    borderRadius: 24,
-    paddingVertical: 16,
+  button: {
+    width: BUTTON_WIDTH,
+    paddingVertical: 12,
+    backgroundColor: '#38275F',
+    borderRadius: 9999,
     alignItems: 'center',
-    marginTop: 24,
+    marginVertical: 12,
   },
-  primaryButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '600',
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
   },
-  socialButton: {
-    width: '100%',
-    backgroundColor: '#3E3160',
-    borderRadius: 24,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  socialButtonText: {
-    color: '#FFF',
-    fontSize: 15,
+  link: {
+    color: '#7B61FF',
+    marginTop: 16,
   },
 });

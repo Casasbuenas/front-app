@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   View,
@@ -48,12 +47,19 @@ const GENDER = [
 
 export default function RegisterScreen() {
   const nav = useNavigation();
+
+  // Tus estados existentes
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedInterests, setSelectedInterests] = useState([]);
+
+  // **Nuevos**: Para manejar usuario y contraseñas
+  const [usuario, setUsuario] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const toggleInterest = (item) => {
     setSelectedInterests((prev) =>
@@ -68,6 +74,41 @@ export default function RegisterScreen() {
     label: `${i + 1}`,
     value: `${i + 1}`,
   }));
+
+  // **Nueva función**: Envía el registro al back-end
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      return alert('Las contraseñas no coinciden.');
+    }
+    try {
+      const resp = await fetch('http://192.168.1.55:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          NombreDeUsuario: usuario,
+          Contraseña: password,
+          ConfirmarContraseña: confirmPassword,
+          // Aquí van todos los campos que ya tenías:
+          Día: selectedDay,
+          Mes: selectedMonth,
+          Género: selectedGender,
+          Intereses: selectedInterests,
+          // Si querías Nombre y Apellido en tu payload, agrégalos:
+          // Nombre, Apellido
+        }),
+      });
+      const json = await resp.json();
+      if (json.status) {
+        alert(json.message);
+        nav.goBack();
+      } else {
+        alert(json.message);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error al conectar al servidor.');
+    }
+  };
 
   return (
     <View style={styles.screen}>
@@ -100,6 +141,8 @@ export default function RegisterScreen() {
           style={styles.input}
           placeholder="Nombre de usuario"
           placeholderTextColor="#888"
+          value={usuario}
+          onChangeText={setUsuario}
         />
 
         {/* Contraseña */}
@@ -109,6 +152,8 @@ export default function RegisterScreen() {
             placeholder="Contraseña"
             placeholderTextColor="#888"
             style={styles.passwordInput}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity
             onPress={() => setShowPwd((v) => !v)}
@@ -129,6 +174,8 @@ export default function RegisterScreen() {
             placeholder="Confirmar contraseña"
             placeholderTextColor="#888"
             style={styles.passwordInput}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
           <TouchableOpacity
             onPress={() => setShowConfirmPwd((v) => !v)}
@@ -209,7 +256,7 @@ export default function RegisterScreen() {
         </View>
 
         {/* Botón Confirmar */}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Confirmar</Text>
         </TouchableOpacity>
       </ScrollView>
