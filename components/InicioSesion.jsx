@@ -22,7 +22,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      const resp = await fetch('http://192.168.1.55:5000/iniciosesion', {
+      const resp = await fetch('https://backend-app-huge.onrender.com/iniciosesion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

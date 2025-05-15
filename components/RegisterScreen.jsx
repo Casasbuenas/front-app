@@ -81,7 +81,7 @@ export default function RegisterScreen() {
       return alert('Las contraseñas no coinciden.');
     }
     try {
-      const resp = await fetch('http://192.168.1.55:5000/register', {
+      const resp = await fetch('https://backend-app-huge.onrender.com/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
