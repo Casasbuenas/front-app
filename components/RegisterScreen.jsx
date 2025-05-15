@@ -48,7 +48,7 @@ const GENDER = [
 export default function RegisterScreen() {
   const nav = useNavigation();
 
-  // Tus estados existentes
+  
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
   const [selectedDay, setSelectedDay] = useState('');
@@ -56,7 +56,7 @@ export default function RegisterScreen() {
   const [selectedGender, setSelectedGender] = useState('');
   const [selectedInterests, setSelectedInterests] = useState([]);
 
-  // **Nuevos**: Para manejar usuario y contraseñas
+  
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -69,13 +69,13 @@ export default function RegisterScreen() {
     );
   };
 
-  // Generamos los días 1–31 para el picker
+
   const DIAS = Array.from({ length: 31 }, (_, i) => ({
     label: `${i + 1}`,
     value: `${i + 1}`,
   }));
 
-  // **Nueva función**: Envía el registro al back-end
+  
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       return alert('Las contraseñas no coinciden.');
@@ -88,13 +88,12 @@ export default function RegisterScreen() {
           NombreDeUsuario: usuario,
           Contraseña: password,
           ConfirmarContraseña: confirmPassword,
-          // Aquí van todos los campos que ya tenías:
+          
           Día: selectedDay,
           Mes: selectedMonth,
           Género: selectedGender,
           Intereses: selectedInterests,
-          // Si querías Nombre y Apellido en tu payload, agrégalos:
-          // Nombre, Apellido
+          
         }),
       });
       const json = await resp.json();
